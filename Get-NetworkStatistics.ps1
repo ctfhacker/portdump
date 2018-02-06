@@ -127,7 +127,7 @@
     
 	begin{
         #Define properties
-            $properties = 'ComputerName','Protocol','LocalAddress','LocalPort','RemoteAddress','RemotePort','State','ProcessName','PID'
+            $properties = 'ComputerName','Protocol','LocalAddress','LocalPort','RemoteAddress','RemotePort','State','ProcessName','PID','ProcessUserName'
 
         #store hostnames in array for quick lookup
             $dnsCache = @{}
@@ -363,7 +363,7 @@
 		    		            ComputerName = $Computer
                                 PID = $procId
                                 ProcessName = (Get-Process -Name $procName).path
-                                # ProcessName = $procName
+                                ProcessUserName = (Get-Process -IncludeUserName -Name $procName).username
 		    		            Protocol = $proto
 		    		            LocalAddress = $localAddress
 		    		            LocalPort = $localPort
