@@ -362,12 +362,7 @@ function Get-Portmap {
     	    		        New-Object -TypeName PSObject -Property @{
 		    		            ComputerName = $Computer
                                 PID = $procId
-                                # ProcessName = (Get-Process -Name $procName).path
-                                # ProcessUserName = (Get-Process -IncludeUserName -Name $procName).username
-                                # ProcessName = $procName
                                 ProcessName = [system.String]::Join(", ", (gwmi win32_process | Where {$_.caption -like "*$procName*"} | select -ExpandProperty commandline))
-                                # ProcessName = gwmi win32_process | Where-Object {$_.ProcessName -eq "$procName"}
-                                # ProcessUserName = gwmi win32_process | Where {$_.ProcessName -eq "$procName"} | Select-Object {$_.getowner().user}
                                 ProcessUserName = [system.String]::Join(", ", (gwmi win32_process | Where {$_.caption -like "*$procName*"} | Select @{Name="Username";Expression={$_.getowner().user}} | Select -ExpandProperty Username))
 		    		            Protocol = $proto
 		    		            LocalAddress = $localAddress
