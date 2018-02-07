@@ -1,4 +1,4 @@
-﻿function Get-NetworkStatistics {
+function Get-Portmap {
     <#
     .SYNOPSIS
 	    Display current TCP/IP connections for local or remote system
@@ -60,25 +60,25 @@
         If specified, we display any result where both the localaddress and the remoteaddress is in the address family.
 
     .EXAMPLE
-	    Get-NetworkStatistics | Format-Table
+	    Get-Portmap | Format-Table
 
     .EXAMPLE
-	    Get-NetworkStatistics iexplore -computername k-it-thin-02 -ShowHostNames | Format-Table
+	    Get-Portmap iexplore -computername k-it-thin-02 -ShowHostNames | Format-Table
 
     .EXAMPLE
-	    Get-NetworkStatistics -ProcessName md* -Protocol tcp
+	    Get-Portmap -ProcessName md* -Protocol tcp
 
     .EXAMPLE
-	    Get-NetworkStatistics -Address 192* -State LISTENING
+	    Get-Portmap -Address 192* -State LISTENING
 
     .EXAMPLE
-	    Get-NetworkStatistics -State LISTENING -Protocol tcp
+	    Get-Portmap -State LISTENING -Protocol tcp
 
     .EXAMPLE
-        Get-NetworkStatistics -Computername Computer1, Computer2
+        Get-Portmap -Computername Computer1, Computer2
 
     .EXAMPLE
-        'Computer1', 'Computer2' | Get-NetworkStatistics
+        'Computer1', 'Computer2' | Get-Portmap
 
     .OUTPUTS
 	    System.Management.Automation.PSObject
@@ -89,7 +89,7 @@
         Cookie Monster's Blog: http://ramblingcookiemonster.github.io/
 
     .LINK
-        http://gallery.technet.microsoft.com/scriptcenter/Get-NetworkStatistics-66057d71
+        http://gallery.technet.microsoft.com/scriptcenter/Get-Portmap-66057d71
     #>	
 	[OutputType('System.Management.Automation.PSObject')]
 	[CmdletBinding()]
@@ -291,9 +291,9 @@
 		    		        }
                    
                         #Display progress bar prior to getting process name or host name
-                            Write-Progress  -Activity "Resolving host and process names"`
-                                -Status "Resolving process ID $procId with remote address $remoteAddress and local address $localAddress"`
-                                -PercentComplete (( $count / $totalCount ) * 100)
+                            # Write-Progress  -Activity "Resolving host and process names"`
+                                # -Status "Resolving process ID $procId with remote address $remoteAddress and local address $localAddress"`
+                                # -PercentComplete (( $count / $totalCount ) * 100)
     	    		
                         #If we are running showprocessnames, get the matching name
                             if($ShowProcessNames -or $PSBoundParameters.ContainsKey -eq 'ProcessName'){
@@ -362,8 +362,13 @@
     	    		        New-Object -TypeName PSObject -Property @{
 		    		            ComputerName = $Computer
                                 PID = $procId
-                                ProcessName = (Get-Process -Name $procName).path
-                                ProcessUserName = (Get-Process -IncludeUserName -Name $procName).username
+                                # ProcessName = (Get-Process -Name $procName).path
+                                # ProcessUserName = (Get-Process -IncludeUserName -Name $procName).username
+                                # ProcessName = $procName
+                                ProcessName = [system.String]::Join(", ", (gwmi win32_process | Where {$_.caption -like "*$procName*"} | select -ExpandProperty commandline))
+                                # ProcessName = gwmi win32_process | Where-Object {$_.ProcessName -eq "$procName"}
+                                # ProcessUserName = gwmi win32_process | Where {$_.ProcessName -eq "$procName"} | Select-Object {$_.getowner().user}
+                                ProcessUserName = [system.String]::Join(", ", (gwmi win32_process | Where {$_.caption -like "*$procName*"} | Select @{Name="Username";Expression={$_.getowner().user}} | Select -ExpandProperty Username))
 		    		            Protocol = $proto
 		    		            LocalAddress = $localAddress
 		    		            LocalPort = $localPort
@@ -379,5 +384,3 @@
         }
     }
 }
-
-Get-NetworkStatistics -State LISTENING
