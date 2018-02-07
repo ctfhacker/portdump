@@ -5,3 +5,11 @@
 # cp portmap.py $EMPIREDIR/lib/modules/powershell/collection/portmap.py
 ```
 
+## Usage 
+
+```
+(Empire) > usemodule powershell/collection/portmap
+(Empire: powershell/collection/portmap) > set Agent ZCVBDULE
+(Empire: powershell/collection/portmap) > execute
+```
+
